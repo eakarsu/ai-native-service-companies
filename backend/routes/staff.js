@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const pool = require('../db');
+const verifyToken = require('../middleware/auth');
+router.use(verifyToken);
+router.get('/', async (req, res) => { try { res.json((await pool.query('SELECT * FROM staff ORDER BY name')).rows); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.get('/:id', async (req, res) => { try { const r = await pool.query('SELECT * FROM staff WHERE id=$1',[req.params.id]); if(!r.rows.length) return res.status(404).json({error:'Not found'}); res.json(r.rows[0]); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.post('/', async (req, res) => { try { const {name,role,specialization,email,active_tasks,completed_tasks,success_rate,availability}=req.body; const r=await pool.query('INSERT INTO staff (name,role,specialization,email,active_tasks,completed_tasks,success_rate,availability) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',[name,role,specialization,email,active_tasks||0,completed_tasks||0,success_rate||100,availability||'available']); res.status(201).json(r.rows[0]); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.put('/:id', async (req, res) => { try { const {name,role,specialization,email,active_tasks,completed_tasks,success_rate,availability}=req.body; const r=await pool.query('UPDATE staff SET name=$1,role=$2,specialization=$3,email=$4,active_tasks=$5,completed_tasks=$6,success_rate=$7,availability=$8 WHERE id=$9 RETURNING *',[name,role,specialization,email,active_tasks,completed_tasks,success_rate,availability,req.params.id]); if(!r.rows.length) return res.status(404).json({error:'Not found'}); res.json(r.rows[0]); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.delete('/:id', async (req, res) => { try { await pool.query('DELETE FROM staff WHERE id=$1',[req.params.id]); res.json({success:true}); } catch (err) { res.status(500).json({ error: err.message }); } });
+module.exports = router;

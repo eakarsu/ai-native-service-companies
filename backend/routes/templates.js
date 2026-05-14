@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const pool = require('../db');
+const verifyToken = require('../middleware/auth');
+router.use(verifyToken);
+router.get('/', async (req, res) => { try { res.json((await pool.query('SELECT * FROM templates ORDER BY service_type')).rows); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.get('/:id', async (req, res) => { try { const r=await pool.query('SELECT * FROM templates WHERE id=$1',[req.params.id]); if(!r.rows.length) return res.status(404).json({error:'Not found'}); res.json(r.rows[0]); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.post('/', async (req, res) => { try { const {service_type,name,description,avg_hours,steps_count,success_rate,last_updated,active}=req.body; const r=await pool.query('INSERT INTO templates (service_type,name,description,avg_hours,steps_count,success_rate,last_updated,active) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',[service_type,name,description,avg_hours,steps_count,success_rate||95,last_updated,active!==false]); res.status(201).json(r.rows[0]); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.put('/:id', async (req, res) => { try { const {service_type,name,description,avg_hours,steps_count,success_rate,last_updated,active}=req.body; const r=await pool.query('UPDATE templates SET service_type=$1,name=$2,description=$3,avg_hours=$4,steps_count=$5,success_rate=$6,last_updated=$7,active=$8 WHERE id=$9 RETURNING *',[service_type,name,description,avg_hours,steps_count,success_rate,last_updated,active,req.params.id]); if(!r.rows.length) return res.status(404).json({error:'Not found'}); res.json(r.rows[0]); } catch (err) { res.status(500).json({ error: err.message }); } });
+router.delete('/:id', async (req, res) => { try { await pool.query('DELETE FROM templates WHERE id=$1',[req.params.id]); res.json({success:true}); } catch (err) { res.status(500).json({ error: err.message }); } });
+module.exports = router;

@@ -1,0 +1,7 @@
+export interface User { id: number; email: string; name: string; role: string; }
+export interface Client { id: number; name: string; company: string; email: string; industry: string; tier: string; status: string; onboarded_at: string; total_tasks: number; satisfaction_score: number; }
+export interface Task { id: number; client_id: number; client_name?: string; company?: string; tier?: string; service_type: string; description: string; priority: string; status: string; assigned_to: string; created_at: string; due_at: string | null; completed_at: string | null; result_summary: string; amount_usd: number; }
+export interface Staff { id: number; name: string; role: string; specialization: string; email: string; active_tasks: number; completed_tasks: number; success_rate: number; availability: string; }
+export interface Invoice { id: number; client_id: number; task_id: number | null; client_name?: string; service_type?: string; amount_usd: number; status: string; issued_date: string | null; due_date: string | null; paid_date: string | null; notes: string; }
+export interface SLA { id: number; client_id: number; client_name?: string; tier?: string; service_type: string; max_hours: number; penalty_per_hour_usd: number; current_status: string; breach_count: number; last_reviewed: string; }
+export interface Template { id: number; service_type: string; name: string; description: string; avg_hours: number; steps_count: number; success_rate: number; last_updated: string; active: boolean; }
