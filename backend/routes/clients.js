@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const verifyToken = require('../middleware/auth');
+const verifyToken = require("../middleware/auth");
 router.use(verifyToken);
 router.get('/', async (req, res) => { try { res.json((await pool.query('SELECT * FROM clients ORDER BY onboarded_at DESC NULLS LAST')).rows); } catch (err) { res.status(500).json({ error: err.message }); } });
 router.get('/:id', async (req, res) => { try { const r = await pool.query('SELECT * FROM clients WHERE id=$1',[req.params.id]); if(!r.rows.length) return res.status(404).json({error:'Not found'}); res.json(r.rows[0]); } catch (err) { res.status(500).json({ error: err.message }); } });
