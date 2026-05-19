@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Briefcase, Users, ClipboardList, UserCheck, FileText, Shield, BookTemplate, Sparkles, LogOut, User, Download, Search, History, Database, LayoutDashboard } from 'lucide-react';
+import { Briefcase, Users, ClipboardList, UserCheck, FileText, Shield, BookTemplate, Sparkles, LogOut, User, Download, Search, History, Database, LayoutDashboard, Layers } from 'lucide-react';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -9,6 +9,7 @@ const navItems = [
   { path: '/invoices', label: 'Invoices', icon: FileText },
   { path: '/slas', label: 'SLA Agreements', icon: Shield },
   { path: '/templates', label: 'Service Templates', icon: BookTemplate },
+  { path: '/custom-views', label: 'Service Views', icon: Layers },
 ];
 const aiItems = [
   { path: '/ai-center', label: 'AI Center', icon: Sparkles },

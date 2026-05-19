@@ -14,6 +14,7 @@ import AuditLogPage from './components/AuditLogPage';
 import SampleDataPage from './pages/SampleDataPage';
 import ServiceCatalog from './pages/ServiceCatalog';
 import Dashboard from './components/Dashboard';
+import CustomViewsPage from './pages/CustomViewsPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   return localStorage.getItem('token') ? <>{children}</> : <Navigate to="/login" replace />;
@@ -43,6 +44,7 @@ export default function App() {
                 <Route path="/audit-log" element={<AuditLogPage />} />
                 <Route path="/sample-data" element={<SampleDataPage />} />
                 <Route path="/service-catalog" element={<ServiceCatalog />} />
+                <Route path="/custom-views" element={<CustomViewsPage />} />
               </Routes>
             </Layout>
           </PrivateRoute>
