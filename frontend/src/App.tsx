@@ -15,6 +15,26 @@ import SampleDataPage from './pages/SampleDataPage';
 import ServiceCatalog from './pages/ServiceCatalog';
 import Dashboard from './components/Dashboard';
 import CustomViewsPage from './pages/CustomViewsPage';
+import RetainerBurnMonitor from './pages/RetainerBurnMonitor';
+
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import GapTemplateRecommendation from './pages/GapTemplateRecommendation';
+import GapPricingOptimizer from './pages/GapPricingOptimizer';
+import GapCapacityForecast from './pages/GapCapacityForecast';
+import GapDeliverableGenerator from './pages/GapDeliverableGenerator';
+import GapClientChurnPredictor from './pages/GapClientChurnPredictor';
+import GapTimeTracking from './pages/GapTimeTracking';
+import GapClientPortal from './pages/GapClientPortal';
+import GapDeliverableStorage from './pages/GapDeliverableStorage';
+import GapPaymentGateway from './pages/GapPaymentGateway';
+import GapNotificationLayer from './pages/GapNotificationLayer';
+import CfAgentFleet from './pages/CfAgentFleet';
+import CfOutcomePricing from './pages/CfOutcomePricing';
+import CfSlackChannelAuto from './pages/CfSlackChannelAuto';
+import CfMarginAnalyzer from './pages/CfMarginAnalyzer';
+import CfServiceProductize from './pages/CfServiceProductize';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   return localStorage.getItem('token') ? <>{children}</> : <Navigate to="/login" replace />;
@@ -24,6 +44,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/*" element={
           <PrivateRoute>
@@ -45,6 +68,22 @@ export default function App() {
                 <Route path="/sample-data" element={<SampleDataPage />} />
                 <Route path="/service-catalog" element={<ServiceCatalog />} />
                 <Route path="/custom-views" element={<CustomViewsPage />} />
+                <Route path="/retainer-burn-monitor" element={<RetainerBurnMonitor />} />
+                <Route path="/gap/template-recommendation" element={<GapTemplateRecommendation />} />
+                <Route path="/gap/pricing-optimizer" element={<GapPricingOptimizer />} />
+                <Route path="/gap/capacity-forecast" element={<GapCapacityForecast />} />
+                <Route path="/gap/deliverable-generator" element={<GapDeliverableGenerator />} />
+                <Route path="/gap/client-churn-predictor" element={<GapClientChurnPredictor />} />
+                <Route path="/gap/time-tracking" element={<GapTimeTracking />} />
+                <Route path="/gap/client-portal" element={<GapClientPortal />} />
+                <Route path="/gap/deliverable-storage" element={<GapDeliverableStorage />} />
+                <Route path="/gap/payment-gateway" element={<GapPaymentGateway />} />
+                <Route path="/gap/notification-layer" element={<GapNotificationLayer />} />
+                <Route path="/cf/agent-fleet" element={<CfAgentFleet />} />
+                <Route path="/cf/outcome-pricing" element={<CfOutcomePricing />} />
+                <Route path="/cf/slack-channel-auto" element={<CfSlackChannelAuto />} />
+                <Route path="/cf/margin-analyzer" element={<CfMarginAnalyzer />} />
+                <Route path="/cf/service-productize" element={<CfServiceProductize />} />
               </Routes>
             </Layout>
           </PrivateRoute>

@@ -32,6 +32,7 @@ app.use('/api/cf-slack-channel-auto', require('./routes/cf-slack-channel-auto'))
 app.use('/api/cf-margin-analyzer', require('./routes/cf-margin-analyzer'));
 app.use('/api/cf-service-productize', require('./routes/cf-service-productize'));
 app.use('/api/custom-views', require('./routes/customViews'));
+app.use('/api/retainer-burn-monitor', require('./routes/retainerBurnMonitor'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
 app.use((err, req, res, next) => { console.error(err.stack); res.status(500).json({ error: 'Internal server error' }); });
 const PORT = process.env.PORT || 3003;

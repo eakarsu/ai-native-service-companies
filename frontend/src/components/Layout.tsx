@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Briefcase, Users, ClipboardList, UserCheck, FileText, Shield, BookTemplate, Sparkles, LogOut, User, Download, Search, History, Database, LayoutDashboard, Layers } from 'lucide-react';
+import { Briefcase, Users, ClipboardList, UserCheck, FileText, Shield, BookTemplate, Sparkles, LogOut, User, Download, Search, History, Database, LayoutDashboard, Layers, DollarSign, TrendingUp, FileCheck, UserMinus, Clock, Globe, FolderArchive, CreditCard, Bell, Bot, Target, MessageSquare, BarChart3, Package } from 'lucide-react';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const navItems = [
   { path: '/slas', label: 'SLA Agreements', icon: Shield },
   { path: '/templates', label: 'Service Templates', icon: BookTemplate },
   { path: '/custom-views', label: 'Service Views', icon: Layers },
+  { path: '/retainer-burn-monitor', label: 'Retainer Burn', icon: DollarSign },
 ];
 const aiItems = [
   { path: '/ai-center', label: 'AI Center', icon: Sparkles },
@@ -20,13 +21,32 @@ const utilItems = [
   { path: '/audit-log', label: 'Audit Log', icon: History },
   { path: '/sample-data', label: 'Sample Data', icon: Database },
 ];
+const gapItems = [
+  { path: '/gap/template-recommendation', label: 'Template Recommendation', icon: BookTemplate },
+  { path: '/gap/pricing-optimizer', label: 'Pricing Optimizer', icon: DollarSign },
+  { path: '/gap/capacity-forecast', label: 'Capacity Forecast', icon: TrendingUp },
+  { path: '/gap/deliverable-generator', label: 'Deliverable Generator', icon: FileCheck },
+  { path: '/gap/client-churn-predictor', label: 'Churn Predictor', icon: UserMinus },
+  { path: '/gap/time-tracking', label: 'Time Tracking', icon: Clock },
+  { path: '/gap/client-portal', label: 'Client Portal', icon: Globe },
+  { path: '/gap/deliverable-storage', label: 'Deliverable Storage', icon: FolderArchive },
+  { path: '/gap/payment-gateway', label: 'Payment Gateway', icon: CreditCard },
+  { path: '/gap/notification-layer', label: 'Notification Layer', icon: Bell },
+];
+const cfItems = [
+  { path: '/cf/agent-fleet', label: 'Agent-Fleet Orchestrator', icon: Bot },
+  { path: '/cf/outcome-pricing', label: 'Outcome-Based Pricing', icon: Target },
+  { path: '/cf/slack-channel-auto', label: 'Slack Channel Auto', icon: MessageSquare },
+  { path: '/cf/margin-analyzer', label: 'Margin Analyzer', icon: BarChart3 },
+  { path: '/cf/service-productize', label: 'Service Productization', icon: Package },
+];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const logout = () => { localStorage.removeItem('token'); localStorage.removeItem('user'); navigate('/login'); };
-  const pageTitle = [...navItems, ...aiItems, ...utilItems].find(i => location.pathname.startsWith(i.path))?.label || 'ServiceFlow';
+  const pageTitle = [...navItems, ...aiItems, ...utilItems, ...gapItems, ...cfItems].find(i => location.pathname.startsWith(i.path))?.label || 'ServiceFlow';
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -53,6 +73,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2 mt-4">Utilities</div>
           {utilItems.map(({ path, label, icon: Icon }) => (
             <Link key={path} to={path} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors ${location.pathname.startsWith(path) ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
+              <Icon className="w-4 h-4 flex-shrink-0" />{label}
+            </Link>
+          ))}
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2 mt-4">Gap Features</div>
+          {gapItems.map(({ path, label, icon: Icon }) => (
+            <Link key={path} to={path} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors ${location.pathname.startsWith(path) ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
+              <Icon className="w-4 h-4 flex-shrink-0" />{label}
+            </Link>
+          ))}
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2 mt-4">Core Functions</div>
+          {cfItems.map(({ path, label, icon: Icon }) => (
+            <Link key={path} to={path} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors ${location.pathname.startsWith(path) ? 'bg-amber-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
               <Icon className="w-4 h-4 flex-shrink-0" />{label}
             </Link>
           ))}

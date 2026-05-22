@@ -207,3 +207,86 @@ two near-identical AI links.
 - Styling matches existing Tailwind patterns.
 - Detailed log:
   `_AUDIT/apply3_logs/merge_ai_ai-native-service-companies.md`.
+
+## Apply pass 7 (full backlog implementation)
+
+Wired 15 backend-only "gap" and "cf" feature pages into the frontend that
+were previously orphaned (route files mounted in `server.js` and page
+components present in `frontend/src/pages/` but **never imported in
+`App.tsx`** and **never linked from the sidebar**). Also resolved the
+explicit "safe-delete candidate" follow-up from pass 5 by removing the
+unused `frontend/src/components/AILab.tsx`.
+
+### Unaddressed items found in the original audit
+1. 10 `gap-*` backend routes mounted (server.js lines 19-28) with matching
+   page components on disk but no route in `App.tsx` and no sidebar entry.
+2. 5 `cf-*` backend routes mounted (server.js lines 29-33) with matching
+   page components on disk but no route in `App.tsx` and no sidebar entry.
+3. `AILab.tsx` left on disk after pass 5 with note "safe-delete candidate
+   for a follow-up" — no route, no sidebar entry, no imports.
+
+### Frontend changes
+- **`frontend/src/App.tsx`** — added 15 imports + 15 `<Route>` entries
+  under `/gap/*` and `/cf/*` paths (all inside the existing
+  `<PrivateRoute><Layout>` wrapper, so JWT + chrome are inherited).
+- **`frontend/src/components/Layout.tsx`** — added two new sidebar
+  sections, "Gap Features" (10 links, emerald-600 active state) and
+  "Core Functions" (5 links, amber-600 active state); extended
+  `pageTitle` lookup to include both new lists; added matching
+  `lucide-react` icons (`DollarSign`, `TrendingUp`, `FileCheck`,
+  `UserMinus`, `Clock`, `Globe`, `FolderArchive`, `CreditCard`,
+  `Bell`, `Bot`, `Target`, `MessageSquare`, `BarChart3`, `Package`).
+- **`frontend/src/components/AILab.tsx`** — deleted (was orphaned).
+
+### Routes wired (15)
+| Sidebar label | Route path | Backend endpoint already mounted |
+|---|---|---|
+| Template Recommendation | `/gap/template-recommendation` | `/api/gap-ai-template-recommendation` |
+| Pricing Optimizer | `/gap/pricing-optimizer` | `/api/gap-ai-pricing-optimizer` |
+| Capacity Forecast | `/gap/capacity-forecast` | `/api/gap-ai-capacity-forecast` |
+| Deliverable Generator | `/gap/deliverable-generator` | `/api/gap-ai-deliverable-generator` |
+| Churn Predictor | `/gap/client-churn-predictor` | `/api/gap-ai-client-churn-predictor` |
+| Time Tracking | `/gap/time-tracking` | `/api/gap-nonai-time-tracking` |
+| Client Portal | `/gap/client-portal` | `/api/gap-nonai-client-portal` |
+| Deliverable Storage | `/gap/deliverable-storage` | `/api/gap-nonai-deliverable-storage` |
+| Payment Gateway | `/gap/payment-gateway` | `/api/gap-nonai-payment-gateway` |
+| Notification Layer | `/gap/notification-layer` | `/api/gap-nonai-notification-layer` |
+| Agent-Fleet Orchestrator | `/cf/agent-fleet` | `/api/cf-agent-fleet` |
+| Outcome-Based Pricing | `/cf/outcome-pricing` | `/api/cf-outcome-pricing` |
+| Slack Channel Auto | `/cf/slack-channel-auto` | `/api/cf-slack-channel-auto` |
+| Margin Analyzer | `/cf/margin-analyzer` | `/api/cf-margin-analyzer` |
+| Service Productization | `/cf/service-productize` | `/api/cf-service-productize` |
+
+### Backend / DB
+- No backend route files were added or modified — all 15 endpoints were
+  already mounted in `server.js` before the 404 handler (lines 19-33).
+- No schema migration needed — each route's `ensureTable()` already runs
+  `CREATE TABLE IF NOT EXISTS gap_features (...)` on first call (matches
+  the required `IF NOT EXISTS` migration pattern).
+- AI calls in those routes degrade gracefully to
+  `"AI unavailable (no API key configured)"` when `OPENROUTER_API_KEY`
+  is missing, so the feature is usable end-to-end without credentials
+  (these are NOT 503-only stubs).
+
+### Items explicitly skipped per the brief
+- None. No pure NEEDS-CREDS 503 stubs were found in the backlog (all
+  routes return useful payloads even without an API key). No advisory
+  TOO-RISKY items were in the audit.
+
+### Syntax / type-check
+- `node --check backend/server.js` → clean (server.js untouched but
+  re-verified after work).
+- `npx tsc --noEmit` on the frontend: no new errors in `App.tsx` or
+  `Layout.tsx`; all 15 new imports resolve. Pre-existing errors in
+  unrelated files (`CustomViewsPage.tsx` casing, `CodexCustomVizFeature
+  .tsx` unused React import, `SlaReportPdf.tsx` unused types) were
+  present before this pass and were not touched.
+
+### Constraints honoured
+- No `npm install`, no new dependencies.
+- No existing route, page, schema, or DB row altered.
+- Sidebar / route additions are purely additive (existing JWT, layout
+  chrome, and active-link styling reused via `Layout`).
+- All 15 new routes nested inside `<PrivateRoute>` so unauthenticated
+  access still redirects to `/login`.
+- `AILab.tsx` removal was explicitly pre-approved in pass 5 notes.
