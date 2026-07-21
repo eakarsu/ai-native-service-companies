@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { FileText, Download, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 
-type SlaRow = { metric: string; target: string; actual: string; compliant: boolean; percent: number };
-type Breach = { date: string; metric: string; detail: string; severity: string };
 type Section = { title: string; body?: string; table?: any[] };
 type Doc = {
   reportId: string;

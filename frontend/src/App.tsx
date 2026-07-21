@@ -16,6 +16,7 @@ import ServiceCatalog from './pages/ServiceCatalog';
 import Dashboard from './components/Dashboard';
 import CustomViewsPage from './pages/CustomViewsPage';
 import RetainerBurnMonitor from './pages/RetainerBurnMonitor';
+import ServiceDeliveryPage from './pages/ServiceDeliveryPage';
 
 import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
 import CodexOperationsFeature from './pages/CodexOperationsFeature';
@@ -40,12 +41,14 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return localStorage.getItem('token') ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+const generatedFeaturesEnabled = (import.meta as any).env?.DEV && (import.meta as any).env?.VITE_ENABLE_GENERATED_FEATURES === 'true';
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
-        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+        {generatedFeaturesEnabled && <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />}
+        {generatedFeaturesEnabled && <Route path="/codex/operations" element={<CodexOperationsFeature />} />}
 
         <Route path="/login" element={<Login />} />
         <Route path="/*" element={
@@ -54,36 +57,37 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/service-delivery" element={<ServiceDeliveryPage />} />
                 <Route path="/clients" element={<ClientsPage />} />
                 <Route path="/tasks" element={<TasksPage />} />
                 <Route path="/staff" element={<StaffPage />} />
                 <Route path="/invoices" element={<InvoicesPage />} />
                 <Route path="/slas" element={<SLAsPage />} />
                 <Route path="/templates" element={<TemplatesPage />} />
-                <Route path="/ai-center" element={<AICenter />} />
-                <Route path="/ai-lab" element={<Navigate to="/ai-center" replace />} />
+                {generatedFeaturesEnabled && <Route path="/ai-center" element={<AICenter />} />}
+                {generatedFeaturesEnabled && <Route path="/ai-lab" element={<Navigate to="/ai-center" replace />} />}
                 <Route path="/export" element={<CSVExport />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/audit-log" element={<AuditLogPage />} />
-                <Route path="/sample-data" element={<SampleDataPage />} />
+                {generatedFeaturesEnabled && <Route path="/sample-data" element={<SampleDataPage />} />}
                 <Route path="/service-catalog" element={<ServiceCatalog />} />
                 <Route path="/custom-views" element={<CustomViewsPage />} />
                 <Route path="/retainer-burn-monitor" element={<RetainerBurnMonitor />} />
-                <Route path="/gap/template-recommendation" element={<GapTemplateRecommendation />} />
-                <Route path="/gap/pricing-optimizer" element={<GapPricingOptimizer />} />
-                <Route path="/gap/capacity-forecast" element={<GapCapacityForecast />} />
-                <Route path="/gap/deliverable-generator" element={<GapDeliverableGenerator />} />
-                <Route path="/gap/client-churn-predictor" element={<GapClientChurnPredictor />} />
-                <Route path="/gap/time-tracking" element={<GapTimeTracking />} />
-                <Route path="/gap/client-portal" element={<GapClientPortal />} />
-                <Route path="/gap/deliverable-storage" element={<GapDeliverableStorage />} />
-                <Route path="/gap/payment-gateway" element={<GapPaymentGateway />} />
-                <Route path="/gap/notification-layer" element={<GapNotificationLayer />} />
-                <Route path="/cf/agent-fleet" element={<CfAgentFleet />} />
-                <Route path="/cf/outcome-pricing" element={<CfOutcomePricing />} />
-                <Route path="/cf/slack-channel-auto" element={<CfSlackChannelAuto />} />
-                <Route path="/cf/margin-analyzer" element={<CfMarginAnalyzer />} />
-                <Route path="/cf/service-productize" element={<CfServiceProductize />} />
+                {generatedFeaturesEnabled && <Route path="/gap/template-recommendation" element={<GapTemplateRecommendation />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/pricing-optimizer" element={<GapPricingOptimizer />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/capacity-forecast" element={<GapCapacityForecast />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/deliverable-generator" element={<GapDeliverableGenerator />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/client-churn-predictor" element={<GapClientChurnPredictor />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/time-tracking" element={<GapTimeTracking />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/client-portal" element={<GapClientPortal />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/deliverable-storage" element={<GapDeliverableStorage />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/payment-gateway" element={<GapPaymentGateway />} />}
+                {generatedFeaturesEnabled && <Route path="/gap/notification-layer" element={<GapNotificationLayer />} />}
+                {generatedFeaturesEnabled && <Route path="/cf/agent-fleet" element={<CfAgentFleet />} />}
+                {generatedFeaturesEnabled && <Route path="/cf/outcome-pricing" element={<CfOutcomePricing />} />}
+                {generatedFeaturesEnabled && <Route path="/cf/slack-channel-auto" element={<CfSlackChannelAuto />} />}
+                {generatedFeaturesEnabled && <Route path="/cf/margin-analyzer" element={<CfMarginAnalyzer />} />}
+                {generatedFeaturesEnabled && <Route path="/cf/service-productize" element={<CfServiceProductize />} />}
               </Routes>
             </Layout>
           </PrivateRoute>

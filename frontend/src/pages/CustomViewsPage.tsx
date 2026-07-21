@@ -1,7 +1,7 @@
-import TicketVolumeTimeline from '../components/CustomViews/TicketVolumeTimeline';
-import AgentPerformanceHeatmap from '../components/CustomViews/AgentPerformanceHeatmap';
-import SlaReportPdf from '../components/CustomViews/SlaReportPdf';
-import ServiceWorkflowEditor from '../components/CustomViews/ServiceWorkflowEditor';
+import TicketVolumeTimeline from '../components/customViews/TicketVolumeTimeline';
+import AgentPerformanceHeatmap from '../components/customViews/AgentPerformanceHeatmap';
+import SlaReportPdf from '../components/customViews/SlaReportPdf';
+import ServiceWorkflowEditor from '../components/customViews/ServiceWorkflowEditor';
 import { Layers } from 'lucide-react';
 
 export default function CustomViewsPage() {

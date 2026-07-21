@@ -1,8 +1,11 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Briefcase, Users, ClipboardList, UserCheck, FileText, Shield, BookTemplate, Sparkles, LogOut, User, Download, Search, History, Database, LayoutDashboard, Layers, DollarSign, TrendingUp, FileCheck, UserMinus, Clock, Globe, FolderArchive, CreditCard, Bell, Bot, Target, MessageSquare, BarChart3, Package } from 'lucide-react';
 
+const generatedFeaturesEnabled = (import.meta as any).env?.DEV && (import.meta as any).env?.VITE_ENABLE_GENERATED_FEATURES === 'true';
+
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/service-delivery', label: 'Service Delivery', icon: Briefcase },
   { path: '/clients', label: 'Clients', icon: Users },
   { path: '/tasks', label: 'Service Tasks', icon: ClipboardList },
   { path: '/staff', label: 'Staff', icon: UserCheck },
@@ -12,16 +15,16 @@ const navItems = [
   { path: '/custom-views', label: 'Service Views', icon: Layers },
   { path: '/retainer-burn-monitor', label: 'Retainer Burn', icon: DollarSign },
 ];
-const aiItems = [
+const aiItems = generatedFeaturesEnabled ? [
   { path: '/ai-center', label: 'AI Center', icon: Sparkles },
-];
+] : [];
 const utilItems = [
   { path: '/search', label: 'Search & Filter', icon: Search },
   { path: '/export', label: 'CSV Export', icon: Download },
   { path: '/audit-log', label: 'Audit Log', icon: History },
-  { path: '/sample-data', label: 'Sample Data', icon: Database },
+  ...(generatedFeaturesEnabled ? [{ path: '/sample-data', label: 'Sample Data', icon: Database }] : []),
 ];
-const gapItems = [
+const gapItems = generatedFeaturesEnabled ? [
   { path: '/gap/template-recommendation', label: 'Template Recommendation', icon: BookTemplate },
   { path: '/gap/pricing-optimizer', label: 'Pricing Optimizer', icon: DollarSign },
   { path: '/gap/capacity-forecast', label: 'Capacity Forecast', icon: TrendingUp },
@@ -32,14 +35,14 @@ const gapItems = [
   { path: '/gap/deliverable-storage', label: 'Deliverable Storage', icon: FolderArchive },
   { path: '/gap/payment-gateway', label: 'Payment Gateway', icon: CreditCard },
   { path: '/gap/notification-layer', label: 'Notification Layer', icon: Bell },
-];
-const cfItems = [
+] : [];
+const cfItems = generatedFeaturesEnabled ? [
   { path: '/cf/agent-fleet', label: 'Agent-Fleet Orchestrator', icon: Bot },
   { path: '/cf/outcome-pricing', label: 'Outcome-Based Pricing', icon: Target },
   { path: '/cf/slack-channel-auto', label: 'Slack Channel Auto', icon: MessageSquare },
   { path: '/cf/margin-analyzer', label: 'Margin Analyzer', icon: BarChart3 },
   { path: '/cf/service-productize', label: 'Service Productization', icon: Package },
-];
+] : [];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();

@@ -1,48 +1,6 @@
-#!/bin/bash
-
-
-echo "Starting ServiceFlow..."
-
-# Load env
-if [ -f .env ]; then
-  export $(cat .env | grep -v '^#' | xargs)
-fi
-
-# Backend
-cd backend
-if [ ! -d node_modules ]; then
-  echo "Installing backend dependencies..."
-  npm install
-fi
-
-echo "Setting up database..."
-psql "$DATABASE_URL" -f db/schema.sql 2>/dev/null || true
-psql "$DATABASE_URL" -f db/seed.sql 2>/dev/null || true
-
-echo "Starting backend on port ${PORT:-3003}..."
-npm run dev &
-BACKEND_PID=$!
-cd ..
-
-# Frontend
-cd frontend
-if [ ! -d node_modules ]; then
-  echo "Installing frontend dependencies..."
-  npm install
-fi
-
-echo "Starting frontend on port 5173..."
-npm run dev &
-FRONTEND_PID=$!
-cd ..
-
-echo ""
-echo "ServiceFlow is running!"
-echo "  Frontend: http://localhost:5173"
-echo "  Backend:  http://localhost:${PORT:-3003}"
-echo "  Login:    admin@demo.com / demo123"
-echo ""
-echo "Press Ctrl+C to stop."
-
-trap "kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit 0" INT TERM
-wait
+#!/bin/sh
+set -eu
+ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd);if [ "${NODE_ENV:-development}" = test ]&&[ -n "${RUNTIME_PROJECT_SOURCE:-}" ]&&[ -d "$RUNTIME_PROJECT_SOURCE" ];then ROOT_DIR=$RUNTIME_PROJECT_SOURCE;fi;cd "$ROOT_DIR";mode="${1:-check}"
+required(){ eval "v=\${$1:-}";[ -n "$v" ]||{ echo "$1 is required" >&2;exit 1;};}
+config(){ if [ "${NODE_ENV:-development}" = test ];then DEFAULT_TENANT_ID=${TENANT_ID:-};JWT_ISSUER=runtime-acceptance;JWT_AUDIENCE=runtime-acceptance-api;CORS_ORIGIN="http://127.0.0.1:${FRONTEND_PORT:-}";export DEFAULT_TENANT_ID JWT_ISSUER JWT_AUDIENCE CORS_ORIGIN;fi;required DATABASE_URL;required JWT_SECRET;required JWT_ISSUER;required JWT_AUDIENCE;case "${BACKEND_PORT:-}" in ''|*[!0-9]*)echo 'BACKEND_PORT must be an explicit integer' >&2;exit 1;;esac;[ "$BACKEND_PORT" -ge 1024 ]&&[ "$BACKEND_PORT" -le 65535 ]||{ echo 'BACKEND_PORT must be between 1024 and 65535' >&2;exit 1;};[ "${#JWT_SECRET}" -ge 32 ]||{ echo 'JWT_SECRET must be at least 32 characters' >&2;exit 1;};}
+case "$mode" in check)(cd backend&&npm run check);(cd frontend&&npm run build);;migrate)config;[ "${ALLOW_SCHEMA_MIGRATION:-}" = 1 ]||{ echo 'Set ALLOW_SCHEMA_MIGRATION=1' >&2;exit 1;};psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f backend/db/migrations/001_service_delivery.sql;;start)config;lsof -nP -iTCP:"$BACKEND_PORT" -sTCP:LISTEN >/dev/null 2>&1&&{ echo "assigned port $BACKEND_PORT is occupied" >&2;exit 1;};PORT=$BACKEND_PORT BACKEND_HOST=127.0.0.1;export PORT BACKEND_HOST;(cd backend&&exec npm start);;*)echo 'usage: ./start.sh check|migrate|start' >&2;exit 2;;esac
