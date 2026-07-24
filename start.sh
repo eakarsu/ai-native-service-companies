@@ -1,6 +1,36 @@
-#!/bin/sh
-set -eu
-ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd);if [ "${NODE_ENV:-development}" = test ]&&[ -n "${RUNTIME_PROJECT_SOURCE:-}" ]&&[ -d "$RUNTIME_PROJECT_SOURCE" ];then ROOT_DIR=$RUNTIME_PROJECT_SOURCE;fi;cd "$ROOT_DIR";mode="${1:-check}"
-required(){ eval "v=\${$1:-}";[ -n "$v" ]||{ echo "$1 is required" >&2;exit 1;};}
-config(){ if [ "${NODE_ENV:-development}" = test ];then DEFAULT_TENANT_ID=${TENANT_ID:-};JWT_ISSUER=runtime-acceptance;JWT_AUDIENCE=runtime-acceptance-api;CORS_ORIGIN="http://127.0.0.1:${FRONTEND_PORT:-}";export DEFAULT_TENANT_ID JWT_ISSUER JWT_AUDIENCE CORS_ORIGIN;fi;required DATABASE_URL;required JWT_SECRET;required JWT_ISSUER;required JWT_AUDIENCE;case "${BACKEND_PORT:-}" in ''|*[!0-9]*)echo 'BACKEND_PORT must be an explicit integer' >&2;exit 1;;esac;[ "$BACKEND_PORT" -ge 1024 ]&&[ "$BACKEND_PORT" -le 65535 ]||{ echo 'BACKEND_PORT must be between 1024 and 65535' >&2;exit 1;};[ "${#JWT_SECRET}" -ge 32 ]||{ echo 'JWT_SECRET must be at least 32 characters' >&2;exit 1;};}
-case "$mode" in check)(cd backend&&npm run check);(cd frontend&&npm run build);;migrate)config;[ "${ALLOW_SCHEMA_MIGRATION:-}" = 1 ]||{ echo 'Set ALLOW_SCHEMA_MIGRATION=1' >&2;exit 1;};psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f backend/db/migrations/001_service_delivery.sql;;start)config;lsof -nP -iTCP:"$BACKEND_PORT" -sTCP:LISTEN >/dev/null 2>&1&&{ echo "assigned port $BACKEND_PORT is occupied" >&2;exit 1;};PORT=$BACKEND_PORT BACKEND_HOST=127.0.0.1;export PORT BACKEND_HOST;(cd backend&&exec npm start);;*)echo 'usage: ./start.sh check|migrate|start' >&2;exit 2;;esac
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Supported lifecycle modes: check|migrate|start. Bare invocation starts the app.
+
+project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+set -a
+source "$project_dir/.env"
+set +a
+
+for required in DATABASE_URL JWT_SECRET JWT_ISSUER JWT_AUDIENCE BACKEND_PORT FRONTEND_PORT; do
+  [ -n "${!required:-}" ] || { echo "$required is required" >&2; exit 1; }
+done
+for assigned_port in "$BACKEND_PORT" "$FRONTEND_PORT"; do
+  lsof -nP -iTCP:"$assigned_port" -sTCP:LISTEN >/dev/null 2>&1 && { echo "assigned port $assigned_port is occupied" >&2; exit 1; }
+done
+
+cd "$project_dir"
+case "${MIGRATE_ON_START:-0}" in
+  1|true)
+    for migration in backend/db/migrations/*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration"; done
+    ;;
+esac
+npm --prefix backend run create-admin
+export ENABLE_GENERATED_FEATURES=true
+BACKEND_HOST=127.0.0.1 PORT="$BACKEND_PORT" npm --prefix backend start & app_pid=$!
+terminate(){ kill "${app_pid:-}" "${proxy_pid:-}" 2>/dev/null || true; wait "${app_pid:-}" "${proxy_pid:-}" 2>/dev/null || true; }
+trap terminate INT TERM EXIT
+for attempt in {1..240}; do
+  curl --max-time 2 -sS "http://127.0.0.1:$BACKEND_PORT/api/health" >/dev/null 2>&1 && break
+  kill -0 "$app_pid" 2>/dev/null || { wait "$app_pid" || true; echo 'application exited before startup' >&2; exit 1; }
+  sleep 0.25
+done
+curl --max-time 5 -sS "http://127.0.0.1:$BACKEND_PORT/api/health" >/dev/null || { echo 'application did not become ready' >&2; exit 1; }
+RUNTIME_PROXY_PORT="$FRONTEND_PORT" RUNTIME_PROXY_TARGET_PORT="$BACKEND_PORT" node "$project_dir/_runtime-proxy.mjs" & proxy_pid=$!
+wait "$app_pid" "$proxy_pid"

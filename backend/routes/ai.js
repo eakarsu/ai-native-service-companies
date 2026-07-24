@@ -5,13 +5,20 @@ const pool = require('../db');
 router.use(verifyToken);
 
 async function callAI(userPrompt, systemPrompt = '') {
-  const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = process.env.OPENROUTER_MODEL;
+  const baseUrl = process.env.OPENROUTER_BASE_URL;
+  if (!apiKey || !model || !baseUrl) throw new Error('OpenRouter configuration is required');
+  const resp = await fetch(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'http://localhost', 'X-Title': 'ServiceFlow' },
-    body: JSON.stringify({ model: process.env.OPENROUTER_MODEL || 'anthropic/claude-haiku-4.5', messages: [...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []), { role: 'user', content: userPrompt }] })
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'http://localhost', 'X-Title': 'ServiceFlow' },
+    body: JSON.stringify({ model, messages: [...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []), { role: 'user', content: userPrompt }] })
   });
+  if (!resp.ok) throw new Error(`OpenRouter returned HTTP ${resp.status}: ${await resp.text()}`);
   const data = await resp.json();
-  return data.choices?.[0]?.message?.content || 'AI unavailable';
+  const content = data.choices?.[0]?.message?.content;
+  if (typeof content !== 'string' || !content.trim()) throw new Error('OpenRouter returned empty content');
+  return content;
 }
 
 router.post('/route-task', async (req, res) => {
@@ -59,7 +66,12 @@ Provide quality review including:
 7. **Best Practices** - Industry best practices that should be applied
 8. **Risk Assessment** - Any compliance or liability risks in the output`;
     const result = await callAI(prompt, 'You are a senior quality assurance manager at a professional services firm with expertise in insurance, accounting, compliance, and healthcare administration.');
-    res.json({ result });
+    const persisted = await pool.query(
+      `INSERT INTO service_ai_results(tenant_id,user_id,feature,input,output,model)
+       VALUES($1,$2,'quality-review',$3::jsonb,$4,$5) RETURNING id`,
+      [req.user.tenantId, req.user.id, JSON.stringify({ task_result, service_type }), result, process.env.OPENROUTER_MODEL],
+    );
+    res.json({ id: persisted.rows[0].id, result, model: process.env.OPENROUTER_MODEL });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
