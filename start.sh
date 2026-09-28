@@ -86,5 +86,5 @@ for attempt in {1..240}; do
   sleep 0.25
 done
 curl --max-time 5 -sS "http://127.0.0.1:$BACKEND_PORT/api/health" >/dev/null || { echo 'application did not become ready' >&2; exit 1; }
-RUNTIME_PROXY_PORT="$FRONTEND_PORT" RUNTIME_PROXY_TARGET_PORT="$BACKEND_PORT" node "$project_dir/_runtime-proxy.mjs" & proxy_pid=$!
+VITE_API_TARGET="http://127.0.0.1:$BACKEND_PORT" npm --prefix frontend run dev -- --host 127.0.0.1 --port "$FRONTEND_PORT" --strictPort & proxy_pid=$!
 wait "$app_pid" "$proxy_pid"
