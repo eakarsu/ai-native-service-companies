@@ -3,47 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Briefcase, LogIn } from 'lucide-react';
 import { api } from '../api';
 
-function __demoAutofill() {
-  (async () => {
-    let email = "";
-    let password = "";
-    try {
-      const response = await fetch("/api/auth/demo-credentials", { cache: "no-store" });
-      if (response.ok) {
-        const data = await response.json();
-        email = data.email || data.username || "";
-        password = data.password || "";
-      }
-    } catch (error) {
-      /* fall back to build-time credentials below */
-    }
-    if (!email || !password) {
-      const env = (typeof process !== "undefined" && process.env) ? process.env : {};
-      email = email || env.REACT_APP_DEMO_EMAIL || env.VITE_DEMO_EMAIL || "";
-      password = password || env.REACT_APP_DEMO_PASSWORD || env.VITE_DEMO_PASSWORD || "";
-    }
-    const form = document.querySelector("form");
-    const setValue = (element, value) => {
-      if (!element) return;
-      const prototype = element.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-      const setter = Object.getOwnPropertyDescriptor(prototype, "value").set;
-      setter.call(element, value);
-      element.dispatchEvent(new Event("input", { bubbles: true }));
-    };
-    const scope = form || document;
-    setValue(scope.querySelector('input[type="email"], input[name="email"], input[name="username"]') || scope.querySelectorAll("input")[0], email);
-    setValue(scope.querySelector('input[type="password"], input[name="password"]') || scope.querySelectorAll("input")[1], password);
-    window.setTimeout(() => {
-      if (form && typeof form.requestSubmit === "function") {
-        form.requestSubmit();
-      } else {
-        const submit = scope.querySelector('button[type="submit"], input[type="submit"]');
-        if (submit) submit.click();
-      }
-    }, 50);
-  })();
-}
-
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -89,7 +48,7 @@ export default function Login() {
             <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"><LogIn className="w-4 h-4" />{loading ? 'Signing in...' : 'Sign In'}</button>
           </form>
           <div className="mt-4">
-            <button onClick={__demoAutofill} className="w-full border border-blue-300 text-blue-700 hover:bg-blue-50 font-medium py-2.5 rounded-lg text-sm transition-colors">Auto Fill Demo Credentials</button>
+            <button onClick={demoLogin} className="w-full border border-blue-300 text-blue-700 hover:bg-blue-50 font-medium py-2.5 rounded-lg text-sm transition-colors">Auto Fill Demo Credentials</button>
           </div>
         </div>
       </div>
