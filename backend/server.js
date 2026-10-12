@@ -36,7 +36,18 @@ function createApp() {
   app.use('/api/slas', require('./routes/slas'));
   app.use('/api/templates', require('./routes/templates'));
   if (process.env.ENABLE_GENERATED_FEATURES === 'true' && process.env.NODE_ENV !== 'production') app.use('/api/ai', require('./routes/ai'));
-  else app.use('/api/ai', (_req, res) => res.status(410).json({ error: 'Ungrounded AI demo endpoints are disabled' }));
+  else {
+    const disabledAIFeatures = [
+      'route-task', 'quality-review', 'client-insights', 'sla-risk',
+      'churn-predictor', 'time-estimator', 'sentiment-classifier', 'invoice-anomaly', 'smart-dispatch',
+    ];
+    const unavailable = (_req, res) => res.json({ result: {
+      availability: 'Unavailable',
+      reason: 'Legacy AI generation is disabled in this environment. No analysis was run.',
+      next_step: 'Open AI reports to prepare a reviewable advisory draft.',
+    } });
+    for (const feature of disabledAIFeatures) app.post(`/api/ai/${feature}`, unavailable);
+  }
   app.use('/api', require('./routes/features'));
   if (process.env.ENABLE_GENERATED_FEATURES === 'true' && process.env.NODE_ENV !== 'production') {
     app.use('/api/admin', require('./routes/sample_data'));
@@ -49,7 +60,15 @@ function createApp() {
   app.use('/api/dashboard', require('./routes/dashboard'));
   app.use('/api/custom-views', require('./routes/customViews'));
   app.use('/api/retainer-burn-monitor', require('./routes/retainerBurnMonitor'));
-  app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
+
+// Advisory AI reports only; native execution and approval routes stay unchanged.
+const aiWorkspaceSupport = require("./aiWorkspaceAdapters.cjs");
+const aiWorkspaceDatabase = require("./db.js");
+app.use('/api/report-workspace', require("./aiWorkspace.cjs").createAIWorkspaceRouter({
+  pool: aiWorkspaceDatabase, authenticateToken: aiWorkspaceSupport.verifiedActorAuth(require("./middleware/auth.js")),
+  aiRateLimiter: aiWorkspaceSupport.createWorkspaceLimiter(), features: require("./aiWorkspaceFeatures.json"),
+}));
+app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
   app.use((error, _req, res, _next) => {
     if (error.type === 'entity.too.large') return res.status(413).json({ error: 'Request too large' });
     console.error(error.stack);

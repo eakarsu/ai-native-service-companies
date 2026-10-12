@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Briefcase, Scale, Calculator, Shield, Search, Users, TrendingUp, RefreshCcw, Award, AlertCircle } from 'lucide-react';
+import { recordRows } from '../api';
 
 type Offering = {
   id: number; sku: string; name: string; vertical: string; description: string;
@@ -68,7 +69,8 @@ export default function ServiceCatalog() {
         authFetch<Offering[]>('/cf-service-productize/'),
         authFetch<{ verticals: VerticalAgg[] }>('/cf-service-productize/catalog/by-vertical')
       ]);
-      setOfferings(o); setVerticals(v.verticals);
+      setOfferings(recordRows<Offering>(o, 'Service catalog'));
+      setVerticals(recordRows<VerticalAgg>(v.verticals, 'Service verticals'));
     } catch (e: any) { setError(e.message); }
     finally { setLoading(false); }
   }

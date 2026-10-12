@@ -6,40 +6,51 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   if (!res.ok) { const err = await res.json().catch(() => ({ error: 'Request failed' })); throw new Error(err.error || 'Request failed'); }
   return res.json();
 }
+export function recordRows<T = any>(payload: unknown, label = 'Records'): T[] {
+  if (Array.isArray(payload)) return payload;
+  if (payload && typeof payload === 'object') {
+    const response = payload as Record<string, unknown>;
+    for (const key of ['data', 'items', 'results']) {
+      if (Array.isArray(response[key])) return response[key] as T[];
+    }
+  }
+  throw new Error(`${label} response did not contain a record list.`);
+}
+const requestRows = async <T = any>(path: string, label: string) => recordRows<T>(await request<unknown>(path), label);
 export const api = {
   login: (email: string, password: string) => request<any>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   me: () => request<any>('/auth/me'),
-  getClients: () => request<any[]>('/clients'),
+  getClients: () => requestRows('/clients', 'Clients'),
   getClient: (id: number) => request<any>(`/clients/${id}`),
   createClient: (d: any) => request<any>('/clients', { method: 'POST', body: JSON.stringify(d) }),
   updateClient: (id: number, d: any) => request<any>(`/clients/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
   deleteClient: (id: number) => request<any>(`/clients/${id}`, { method: 'DELETE' }),
-  getTasks: () => request<any[]>('/tasks'),
+  getTasks: () => requestRows('/tasks', 'Tasks'),
   getTask: (id: number) => request<any>(`/tasks/${id}`),
   createTask: (d: any) => request<any>('/tasks', { method: 'POST', body: JSON.stringify(d) }),
   updateTask: (id: number, d: any) => request<any>(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
   deleteTask: (id: number) => request<any>(`/tasks/${id}`, { method: 'DELETE' }),
-  getStaff: () => request<any[]>('/staff'),
+  getStaff: () => requestRows('/staff', 'Staff'),
   getStaffMember: (id: number) => request<any>(`/staff/${id}`),
   createStaff: (d: any) => request<any>('/staff', { method: 'POST', body: JSON.stringify(d) }),
   updateStaff: (id: number, d: any) => request<any>(`/staff/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
   deleteStaff: (id: number) => request<any>(`/staff/${id}`, { method: 'DELETE' }),
-  getInvoices: () => request<any[]>('/invoices'),
+  getInvoices: () => requestRows('/invoices', 'Invoices'),
   getInvoice: (id: number) => request<any>(`/invoices/${id}`),
   createInvoice: (d: any) => request<any>('/invoices', { method: 'POST', body: JSON.stringify(d) }),
   updateInvoice: (id: number, d: any) => request<any>(`/invoices/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
   deleteInvoice: (id: number) => request<any>(`/invoices/${id}`, { method: 'DELETE' }),
-  getSLAs: () => request<any[]>('/slas'),
+  getSLAs: () => requestRows('/slas', 'SLAs'),
   getSLA: (id: number) => request<any>(`/slas/${id}`),
   createSLA: (d: any) => request<any>('/slas', { method: 'POST', body: JSON.stringify(d) }),
   updateSLA: (id: number, d: any) => request<any>(`/slas/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
   deleteSLA: (id: number) => request<any>(`/slas/${id}`, { method: 'DELETE' }),
-  getDeliveryOrders: () => request<any[]>('/governed-delivery/orders'),
+  getDeliveryOrders: () => requestRows('/governed-delivery/orders', 'Delivery orders'),
   getDeliveryOrder: (id: string) => request<any>(`/governed-delivery/orders/${id}`),
   createDeliveryOrder: (data: any, idempotencyKey: string) => request<any>('/governed-delivery/orders', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify(data) }),
   transitionDeliveryOrder: (id: string, data: any) => request<any>(`/governed-delivery/orders/${id}/transitions`, { method: 'POST', body: JSON.stringify(data) }),
   requestDeliveryPayment: (id: string, data: any) => request<any>(`/governed-delivery/orders/${id}/payment`, { method: 'POST', body: JSON.stringify(data) }),
-  getTemplates: () => request<any[]>('/templates'),
+  getTemplates: () => requestRows('/templates', 'Templates'),
   getTemplate: (id: number) => request<any>(`/templates/${id}`),
   createTemplate: (d: any) => request<any>('/templates', { method: 'POST', body: JSON.stringify(d) }),
   updateTemplate: (id: number, d: any) => request<any>(`/templates/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
@@ -77,7 +88,7 @@ export const api = {
     if (params?.entity) qs.append('entity', params.entity);
     if (params?.limit) qs.append('limit', String(params.limit));
     const s = qs.toString();
-    return request<any[]>(`/audit-log${s ? '?' + s : ''}`);
+    return requestRows(`/audit-log${s ? '?' + s : ''}`, 'Audit log');
   },
   postAuditLog: (d: any) => request<any>('/audit-log', { method: 'POST', body: JSON.stringify(d) }),
   // Sample data seeding

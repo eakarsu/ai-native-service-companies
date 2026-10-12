@@ -22,7 +22,15 @@ export default function Login() {
   };
 
   const demoLogin = () => {
-    setEmail(import.meta.env.VITE_DEMO_EMAIL || ''); setPassword(import.meta.env.VITE_DEMO_PASSWORD || '');
+    const demoEmail = import.meta.env.VITE_DEMO_EMAIL;
+    const demoPassword = import.meta.env.VITE_DEMO_PASSWORD;
+    if (!demoEmail || !demoPassword) {
+      setError('Demo credentials are not configured for this session. Sign in with your account.');
+      return;
+    }
+    setError('');
+    setEmail(demoEmail);
+    setPassword(demoPassword);
   };
 
   return (
@@ -48,7 +56,7 @@ export default function Login() {
             <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"><LogIn className="w-4 h-4" />{loading ? 'Signing in...' : 'Sign In'}</button>
           </form>
           <div className="mt-4">
-            <button onClick={demoLogin} className="w-full border border-blue-300 text-blue-700 hover:bg-blue-50 font-medium py-2.5 rounded-lg text-sm transition-colors">Auto Fill Demo Credentials</button>
+            <button type="button" onClick={demoLogin} className="w-full border border-blue-300 text-blue-700 hover:bg-blue-50 font-medium py-2.5 rounded-lg text-sm transition-colors">Fill demo credentials</button>
           </div>
         </div>
       </div>

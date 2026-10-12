@@ -1,0 +1,107 @@
+[
+  {
+    "name": "CfAgentFleet",
+    "id": "cf-agent-fleet",
+    "title": "Agent-Fleet Orchestrator",
+    "description": "Prepare a professional advisory report for agent-fleet orchestrator using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfMarginAnalyzer",
+    "id": "cf-margin-analyzer",
+    "title": "Per-Task Margin Analyzer",
+    "description": "Prepare a professional advisory report for per-task margin analyzer using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfOutcomePricing",
+    "id": "cf-outcome-pricing",
+    "title": "Outcome-Based Pricing Engine",
+    "description": "Prepare a professional advisory report for outcome-based pricing engine using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfServiceProductize",
+    "id": "cf-service-productize",
+    "title": "Service Productization",
+    "description": "Prepare a professional advisory report for service productization using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfSlackChannelAuto",
+    "id": "cf-slack-channel-auto",
+    "title": "Auto-Provisioned Client Slack",
+    "description": "Prepare a professional advisory report for auto-provisioned client slack using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapCapacityForecast",
+    "id": "gap-ai-capacity-forecast",
+    "title": "Capacity Forecast",
+    "description": "Prepare a professional advisory report for capacity forecast using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapClientChurnPredictor",
+    "id": "gap-ai-client-churn-predictor",
+    "title": "Client Churn Predictor",
+    "description": "Prepare a professional advisory report for client churn predictor using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapClientPortal",
+    "id": "gap-nonai-client-portal",
+    "title": "Client Portal Route",
+    "description": "Prepare a professional advisory report for client portal route using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapDeliverableGenerator",
+    "id": "gap-ai-deliverable-generator",
+    "title": "Deliverable Generator",
+    "description": "Prepare a professional advisory report for deliverable generator using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapDeliverableStorage",
+    "id": "gap-nonai-deliverable-storage",
+    "title": "Deliverable File Storage",
+    "description": "Prepare a professional advisory report for deliverable file storage using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNotificationLayer",
+    "id": "gap-nonai-notification-layer",
+    "title": "Email / Notification Layer",
+    "description": "Prepare a professional advisory report for email / notification layer using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapPaymentGateway",
+    "id": "gap-nonai-payment-gateway",
+    "title": "Payment Gateway Connector",
+    "description": "Prepare a professional advisory report for payment gateway connector using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapPricingOptimizer",
+    "id": "gap-ai-pricing-optimizer",
+    "title": "Pricing Optimizer",
+    "description": "Prepare a professional advisory report for pricing optimizer using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapTemplateRecommendation",
+    "id": "gap-ai-template-recommendation",
+    "title": "Template Recommendation",
+    "description": "Prepare a professional advisory report for template recommendation using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapTimeTracking",
+    "id": "gap-nonai-time-tracking",
+    "title": "Time Tracking",
+    "description": "Prepare a professional advisory report for time tracking using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  }
+]
